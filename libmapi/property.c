@@ -1904,8 +1904,6 @@ size_t get_utf8_utf16_conv_length(const char *inbuf)
 				continue;
 			}
 
-			codepoint -= 0x10000;
-
 			if (out_left < 4) {
 				return -1;
 			}
