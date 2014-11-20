@@ -94,7 +94,6 @@ _PUBLIC_ struct Binary_r *generate_recipient_entryid(TALLOC_CTX *mem_ctx, const 
 
 	if (recipient_id) {
 		strcpy((char *)entryid->lpb + off, guid);
-		off += strlen(recipient_id);
 	}
 	
 	return entryid;

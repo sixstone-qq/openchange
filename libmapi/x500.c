@@ -61,7 +61,6 @@ _PUBLIC_ char *x500_get_dn_element(TALLOC_CTX *mem_ctx, const char *dn, const ch
 	}
 
 	pdn += strlen(element);
-	p = pdn;
 
 	if ((p = strchr(pdn, '/')) != NULL) {
 		p[0] = '\0';
