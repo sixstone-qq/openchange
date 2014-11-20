@@ -385,6 +385,8 @@ _PUBLIC_ struct idset *IDSET_parse(TALLOC_CTX *mem_ctx, DATA_BLOB buffer, bool i
 
 		globset.length = buffer.length - 16;
 		globset.data = (uint8_t *) buffer.data + 16;
+                /* TODO: Fix this by checking range is not NULL */
+                byte_count = 0;
 		idset->ranges = GLOBSET_parse(idset, globset, &idset->range_count, &byte_count);
 		
 		total_bytes += byte_count;
