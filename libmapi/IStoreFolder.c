@@ -165,6 +165,7 @@ _PUBLIC_ enum MAPISTATUS OpenMessage(mapi_object_t *obj_store,
 
 		lpProp.ulPropTag = PR_RECIPIENT_TYPE;
 		lpProp.value.l = reply->RecipientRows[i].RecipientType;
+                lpProp.dwAlignPad = 0;
 		SRow_addprop(&(message->SRowSet.aRow[i]), lpProp);
 
 		lpProp.ulPropTag = PR_INTERNET_CPID;
