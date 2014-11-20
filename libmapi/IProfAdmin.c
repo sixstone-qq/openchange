@@ -240,7 +240,7 @@ static enum MAPISTATUS ldb_delete_profile(TALLOC_CTX *mem_ctx,
 	int			ret;
 
 	ret = ldb_search(ldb_ctx, mem_ctx, &res, ldb_get_default_basedn(ldb_ctx), scope, attrs, "(cn=%s)(cn=Profiles)", profname);
-	if (!res->msgs) return MAPI_E_NOT_FOUND;
+	if (ret != LDB_SUCCESS || !res->msgs) return MAPI_E_NOT_FOUND;
 
 	ret = ldb_delete(ldb_ctx, res->msgs[0]->dn);
 	if (ret != LDB_SUCCESS) return MAPI_E_NOT_FOUND;
