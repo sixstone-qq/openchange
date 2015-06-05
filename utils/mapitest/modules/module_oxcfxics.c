@@ -244,7 +244,7 @@ cleanup:
 
    This function:
    -# Log on private message store
-   -# Cremapidump_fx_bufferates a test folder
+   -# Create mapidump_fx_buffer a test folder
    -# Setup source
    -# Get data
  */
@@ -527,8 +527,9 @@ cleanup:
    This function:
    -# Log on private message store
    -# Creates a test folder
-   -# Sets up sync configure context
+   -# Sets up sync configure context for downloading contents
    -# Uploads an empty ICS state
+   -# Download current state
    -# cleans up.
  */
 _PUBLIC_ bool mapitest_oxcfxics_SyncConfigure(struct mapitest *mt)
@@ -543,6 +544,10 @@ _PUBLIC_ bool mapitest_oxcfxics_SyncConfigure(struct mapitest *mt)
 	DATA_BLOB		ics_state;
 	struct SPropTagArray	*property_tags;
 	bool			ret = true;
+        DATA_BLOB               transfer_data;
+	struct fx_parser_context	*parser;
+        enum TransferStatus     transfer_status;
+        uint16_t                progress, total_steps;
 
 	/* Logon */
 	if (! mapitest_common_setup(mt, &obj_htable, NULL)) {
@@ -567,8 +572,9 @@ _PUBLIC_ bool mapitest_oxcfxics_SyncConfigure(struct mapitest *mt)
 	property_tags = set_SPropTagArray(mt->mem_ctx, 0x0);
 	restriction.length = 0;
 	restriction.data = NULL;
-	retval = ICSSyncConfigure(&download_folder, Hierarchy,
-				  FastTransfer_Unicode, SynchronizationFlag_Unicode,
+	retval = ICSSyncConfigure(&download_folder, Contents,
+				  FastTransfer_Unicode,
+                                  SynchronizationFlag_Unicode | SynchronizationFlag_Normal | SynchronizationFlag_NoForeignIdentifiers,
 				  Eid | Cn, restriction, property_tags, &obj_sync_context);
 	mapitest_print_retval_clean(mt, "ICSSyncConfigure", retval);
 	if (retval != MAPI_E_SUCCESS) {
@@ -599,6 +605,22 @@ _PUBLIC_ bool mapitest_oxcfxics_SyncConfigure(struct mapitest *mt)
 		ret = false;
 		goto cleanup;
 	}
+
+        retval = FXGetBuffer(&obj_sync_context, 0, &transfer_status, &progress, &total_steps,
+                             &transfer_data);
+        mapitest_print_retval_clean(mt, "FXGetBuffer", retval);
+        if (retval != MAPI_E_SUCCESS) {
+                ret = false;
+                goto cleanup;
+        }
+	parser = fxparser_init(mt->mem_ctx, NULL);
+	retval = fxparser_parse(parser, &transfer_data);
+        mapitest_print_retval_clean(mt, "FX buffer parse", retval);
+        if (retval != MAPI_E_SUCCESS) {
+                ret = false;
+        }
+	talloc_free(parser);
+	// TODO: verify that the buffer is as expected
 
 	retval = ICSSyncGetTransferState(&obj_sync_context, &obj_transfer_state);
 	mapitest_print_retval_clean(mt, "ICSSyncGetTransferState", retval);
