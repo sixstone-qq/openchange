@@ -302,6 +302,7 @@ _PUBLIC_ uint32_t module_oxcfxics_init(struct mapitest *mt)
 	mapitest_suite_add_test(suite, "DEST-CONFIGURE", "Test Destination Configure operation", mapitest_oxcfxics_DestConfigure);
 	mapitest_suite_add_test(suite, "SYNC-CONFIGURE-HIERARCHY", "Configure ICS hierarchy context for download", mapitest_oxcfxics_SyncConfigureHierarchy);
 	mapitest_suite_add_test(suite, "SYNC-CONFIGURE-CONTENTS", "Configure ICS contents context for download", mapitest_oxcfxics_SyncConfigureContents);
+	mapitest_suite_add_test(suite, "SYNC-CONFIGURE-INBOX-CONTENTS", "Configure ICS contents context for download INBOX folder", mapitest_oxcfxics_SyncConfigureINBOXContents);
 	mapitest_suite_add_test(suite, "SET-LOCAL-REPLICA-MIDSET-DELETED", "Reserve a range of local replica IDs", mapitest_oxcfxics_SetLocalReplicaMidsetDeleted);
 	mapitest_suite_add_test(suite, "SYNC-OPEN-COLLECTOR", "Test opening ICS upload collector", mapitest_oxcfxics_SyncOpenCollector);
 

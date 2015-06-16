@@ -784,6 +784,182 @@ cleanup:
 }
 
 /**
+   \details Test the RopSynchronizationConfigure (0x70),
+   RopSynchronizationUploadStateStreamBegin (0x75),
+   RopSynchronizationUploadStateStreamContinue (0x76),
+   RopSynchronizationUploadStateStreamEnd (0x77),
+   RopFastTransferSourceGetBuffer (0x4e) and
+   RopSynchronizationGetTransferState (0x82) operations
+   for content synchronisation.
+
+   This function:
+   -# Log on private message store
+   -# Creates a test folder
+   -# Sets up sync configure context
+   -# Uploads an empty ICS state
+   -# cleans up.
+ */
+_PUBLIC_ bool mapitest_oxcfxics_SyncConfigureINBOXContents(struct mapitest *mt)
+{
+	enum MAPISTATUS		retval;
+	mapi_id_t		id_folder;
+	mapi_object_t		obj_store;
+	mapi_object_t		obj_sync_context;
+	mapi_object_t		download_folder;
+	mapi_object_t		obj_transfer_state;
+	DATA_BLOB		restriction;
+	DATA_BLOB		ics_state;
+	struct SPropTagArray	*property_tags;
+	bool			ret = true;
+	DATA_BLOB		transfer_data;
+	struct fx_parser_context	*parser;
+	enum TransferStatus	transfer_status;
+	uint16_t		progress, total_steps;
+        uint8_t                 restriction_data[] = {0x1, 0x2, 0x0, 0x4, 0x3, 0x40, 0x0, 0x6,
+                                                      0xe, 0x40, 0x0, 0x6, 0xe, 0x0, 0x40, 0x33,
+                                                      0x9f, 0x7f, 0x61, 0xce, 0x1, 0x6, 0x1, 0x3,
+                                                      0x0, 0x7, 0xe, 0x40, 0x0, 0x0, 0x0};
+
+	mapi_object_init(&obj_store);
+
+	/* Logon */
+        retval = OpenMsgStore(mt->session, &obj_store);
+	mapitest_print_retval_clean(mt, "OpenMsgStore", retval);
+	if (retval != MAPI_E_SUCCESS) {
+                mapi_object_release(&obj_store);
+                return false;
+	}
+
+	/* Step 2. Open Top Information Store folder */
+	retval = GetDefaultFolder(&obj_store, &id_folder, olFolderInbox);
+	mapitest_print_retval_clean(mt, "GetDefaultFolder", retval);
+	if (retval != MAPI_E_SUCCESS) {
+                mapi_object_release(&obj_store);
+                return false;
+	}
+
+	mapi_object_init(&download_folder);
+	mapi_object_init(&obj_sync_context);
+	mapi_object_init(&obj_transfer_state);
+
+	mapi_object_init(&download_folder);
+	retval = OpenFolder(&obj_store, id_folder, &download_folder);
+	mapitest_print_retval_clean(mt, "OpenFolder", retval);
+	if (retval != MAPI_E_SUCCESS) {
+		ret = false;
+		goto cleanup;
+	}
+
+	property_tags = set_SPropTagArray(mt->mem_ctx, 0x9,
+                                          PidTagBody,
+                                          0x10060003,
+                                          0x10070003,
+                                          0x1008001f,
+                                          0x10100003,
+                                          0x10110003,
+                                          PidTagCreatorName,
+                                          PidTagCreatorEntryId,
+                                          0x300F0102);
+	restriction.length = 31;
+	restriction.data = restriction_data;
+	retval = ICSSyncConfigure(&download_folder, Contents,
+				  FastTransfer_Unicode | FastTransfer_RecoverMode | FastTransfer_ForceUnicode | FastTransfer_PartialItem,
+				  SynchronizationFlag_Unicode | SynchronizationFlag_ReadState | SynchronizationFlag_FAI | SynchronizationFlag_Normal | SynchronizationFlag_NoForeignIdentifiers | SynchronizationFlag_BestBody | SynchronizationFlag_Progress,
+				  Eid | Cn | OrderByDeliveryTime,
+				  restriction, property_tags, &obj_sync_context);
+	mapitest_print_retval_clean(mt, "ICSSyncConfigure", retval);
+	if (retval != MAPI_E_SUCCESS) {
+		ret = false;
+		goto cleanup;
+	}
+
+	ics_state.length = 0;
+	ics_state.data = NULL;
+
+	retval = ICSSyncUploadStateBegin(&obj_sync_context, MetaTagIdsetGiven, ics_state.length);
+	mapitest_print_retval_clean(mt, "ICSSyncUploadStateBegin IdsetGiven", retval);
+	if (retval != MAPI_E_SUCCESS) {
+		ret = false;
+		goto cleanup;
+	}
+
+	retval = ICSSyncUploadStateEnd(&obj_sync_context);
+	mapitest_print_retval_clean(mt, "ICSSyncUploadStateEnd", retval);
+	if (retval != MAPI_E_SUCCESS) {
+		ret = false;
+		goto cleanup;
+	}
+
+	retval = ICSSyncUploadStateBegin(&obj_sync_context, MetaTagCnsetSeen, ics_state.length);
+	mapitest_print_retval_clean(mt, "ICSSyncUploadStateBegin CnsetSeen", retval);
+	if (retval != MAPI_E_SUCCESS) {
+		ret = false;
+		goto cleanup;
+	}
+
+	retval = ICSSyncUploadStateEnd(&obj_sync_context);
+	mapitest_print_retval_clean(mt, "ICSSyncUploadStateEnd", retval);
+	if (retval != MAPI_E_SUCCESS) {
+		ret = false;
+		goto cleanup;
+	}
+
+	retval = ICSSyncUploadStateBegin(&obj_sync_context, MetaTagCnsetSeenFAI, ics_state.length);
+	mapitest_print_retval_clean(mt, "ICSSyncUploadStateBegin CnsetSeenFAI", retval);
+	if (retval != MAPI_E_SUCCESS) {
+		ret = false;
+		goto cleanup;
+	}
+
+	retval = ICSSyncUploadStateEnd(&obj_sync_context);
+	mapitest_print_retval_clean(mt, "ICSSyncUploadStateEnd", retval);
+	if (retval != MAPI_E_SUCCESS) {
+		ret = false;
+		goto cleanup;
+	}
+
+	retval = ICSSyncUploadStateBegin(&obj_sync_context, MetaTagCnsetRead, ics_state.length);
+	mapitest_print_retval_clean(mt, "ICSSyncUploadStateBegin CnsetRead", retval);
+	if (retval != MAPI_E_SUCCESS) {
+		ret = false;
+		goto cleanup;
+	}
+
+	retval = ICSSyncUploadStateEnd(&obj_sync_context);
+	mapitest_print_retval_clean(mt, "ICSSyncUploadStateEnd", retval);
+	if (retval != MAPI_E_SUCCESS) {
+		ret = false;
+		goto cleanup;
+	}
+
+	retval = FXGetBuffer(&obj_sync_context, 0, &transfer_status, &progress, &total_steps,
+			     &transfer_data);
+	mapitest_print_retval_clean(mt, "FXGetBuffer", retval);
+	if (retval != MAPI_E_SUCCESS) {
+		ret = false;
+		goto cleanup;
+	}
+
+	parser = fxparser_init(mt->mem_ctx, NULL);
+	retval = fxparser_parse(parser, &transfer_data);
+	mapitest_print_retval_clean(mt, "FX buffer parse", retval);
+	if (retval != MAPI_E_SUCCESS) {
+		ret = false;
+	}
+	talloc_free(parser);
+	// TODO: verify that the buffer is as expected
+
+cleanup:
+	/* Cleanup and release */
+	mapi_object_release(&obj_transfer_state);
+	mapi_object_release(&obj_sync_context);
+	mapi_object_release(&download_folder);
+	mapi_object_release(&obj_store);
+
+	return ret;
+}
+
+/**
    \details Test the GetLocalReplicaId (0x7f) and SetLocalReplicaMidsetDeleted (0x93)
    operations
 
