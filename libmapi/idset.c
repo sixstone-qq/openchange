@@ -380,6 +380,8 @@ _PUBLIC_ struct idset *IDSET_parse(TALLOC_CTX *mem_ctx, DATA_BLOB buffer, bool i
 		id_length = 16;
 	}
 
+	id_length = (idbased == true) ? 2 : 16;
+
 	total_bytes = 0;
 	while (total_bytes < buffer.length) {
 		idset = talloc_zero(mem_ctx, struct idset);
