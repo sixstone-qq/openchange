@@ -368,19 +368,13 @@ static void check_idset(const struct idset *idset)
 */
 _PUBLIC_ struct idset *IDSET_parse(TALLOC_CTX *mem_ctx, DATA_BLOB buffer, bool idbased)
 {
-	struct idset		*idset, *prev_idset = NULL;
+	struct idset		*idset = NULL, *prev_idset = NULL;
 	DATA_BLOB		guid_blob, globset;
 	uint32_t		total_bytes, byte_count, id_length;
 
-	if (buffer.length < 16) return NULL;
-
-	if (idbased) {
-		id_length = 2;
-	} else {
-		id_length = 16;
-	}
-
 	id_length = (idbased == true) ? 2 : 16;
+
+	if (buffer.length < id_length) return NULL;
 
 	total_bytes = 0;
 	while (total_bytes < buffer.length) {
