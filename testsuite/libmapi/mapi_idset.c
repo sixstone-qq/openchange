@@ -148,7 +148,7 @@ START_TEST (test_IDSET_includes_guid_glob) {
         for (i = 0; i < ids_size; i++) {
                 RAWIDSET_push_eid(rawidset_in, (ids[i] << 16) | repl_id);
         }
-        ck_assert_uint_eq(rawidset_in->count, ids_size);
+        ck_assert_int_eq(rawidset_in->count, ids_size);
         rawidset_in->idbased = false;
         rawidset_in->repl.guid = server_guid;
         idset_in = RAWIDSET_convert_to_idset(mem_ctx, rawidset_in);
@@ -184,7 +184,6 @@ static void tc_IDSET_parse_teardown(void)
 	talloc_free(mem_ctx);
 }
 
-
 static void tc_IDSET_remove_rawidset_setup(void)
 {
 	mem_ctx = talloc_new(talloc_autofree_context());
@@ -194,7 +193,6 @@ static void tc_IDSET_includes_guid_glob_setup(void)
 {
 	mem_ctx = talloc_new(talloc_autofree_context());
 }
-
 
 static void tc_IDSET_remove_rawidset_teardown(void)
 {
@@ -225,7 +223,6 @@ Suite *libmapi_idset_suite(void)
 	tcase_add_checked_fixture(tc, tc_IDSET_includes_guid_glob_setup, tc_IDSET_includes_guid_glob_teardown);
 	tcase_add_test(tc, test_IDSET_includes_guid_glob);
 	suite_add_tcase(s, tc);
-
 
 	return s;
 }
