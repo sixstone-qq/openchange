@@ -882,7 +882,7 @@ static bool oxcfxics_push_messageChange(struct emsmdbp_context *emsmdbp_ctx, str
 
 			OC_DEBUG(5, "push_messageChange: %d objects in table\n", table_object->object.table->denominator);
 
-			/* fetch maching mids */
+			/* fetch matching mids */
 			message_sync_data->mids = talloc_zero_array(message_sync_data, uint64_t, table_object->object.table->denominator);
 			if (!message_sync_data->mids) {
 				OC_DEBUG(1, "Error allocating mid array");
@@ -1088,6 +1088,7 @@ static bool oxcfxics_push_messageChange(struct emsmdbp_context *emsmdbp_ctx, str
 		if (synccontext->request.request_eid) {
 			query_props.aulPropTag[i] = PidTagMid;
 			header_data_pointers[i] = &eid;
+                        OC_DEBUG(5, "Pushing message eid: 0x%"PRIx64, eid);
 			i++;
 		}
 
@@ -1531,6 +1532,7 @@ static void oxcfxics_push_folderChange(struct emsmdbp_context *emsmdbp_ctx, stru
 			if (synccontext->request.request_eid) {
 				query_props.aulPropTag[j] = PidTagFolderId;
 				header_data_pointers[j] = data_pointers[sync_data->prop_index.eid];
+                                OC_DEBUG(5, "Pushing folder eid: 0x%"PRIx64, data_pointers[sync_data->prop_index.eid]);
 				j++;
 			}
 
@@ -3612,6 +3614,11 @@ static enum MAPISTATUS oxcfxics_ndr_push_transfer_state(struct ndr_push *ndr, co
 		ndr_push_uint32(ndr, NDR_SCALARS, MetaTagCnsetRead);
 		ndr_push_idset(ndr, synccontext->cnset_seen);
 	}
+
+        OC_DEBUG(5, "GetTransferState for fid: 0x%"PRIx64, synccontext_object->parent_object->object.folder->folderID);
+        IDSET_dump(synccontext->idset_given, "IdsetGiven");
+        IDSET_dump(synccontext->cnset_seen, "CnsetSeen");
+        IDSET_dump(synccontext->cnset_seen_fai, "CnsetSeen");
 
 	talloc_free(mem_ctx);
 
