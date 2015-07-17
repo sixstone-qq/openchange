@@ -1066,6 +1066,37 @@ _PUBLIC_ void IDSET_dump(const struct idset *idset, const char *label)
 	}
 }
 
+/**ta
+  \details dump a rawidset structure
+
+  \param idset pointer to the rawidset structure to dump
+  \param label string to define the dump in log
+*/
+_PUBLIC_ void RAWIDSET_dump(const struct rawidset *rawidset, const char *label)
+{
+	uint32_t i;
+	char *guid_str;
+
+	OC_DEBUG(5, "[%s] Dump of rawidset", label);
+	while (rawidset) {
+		if (rawidset->idbased) {
+                        OC_DEBUG(5, "  %.4x: %d elements single: %d", rawidset->repl.id, rawidset->count, rawidset->single);
+		}
+		else {
+			guid_str = GUID_string(NULL, &rawidset->repl.guid);
+			OC_DEBUG(5, "  %s: %d elements", guid_str, rawidset->count);
+			talloc_free(guid_str);
+		}
+
+		for (i = 0; i < rawidset->count; i++) {
+			OC_DEBUG(5, "  0x%.12" PRIx64, rawidset->globcnts[i]);
+		}
+
+		rawidset = rawidset->next;
+	}
+}
+
+
 /**
   \details check GLOBCNT ranges from an idset structure. [MS-OXCFXICS] Section 3.1.5.4.3.2.4
 

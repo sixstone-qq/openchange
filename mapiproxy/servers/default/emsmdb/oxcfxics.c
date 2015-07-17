@@ -1177,6 +1177,7 @@ static bool oxcfxics_push_messageChange(struct emsmdbp_context *emsmdbp_ctx, str
 				}
 				if (sync_data->deleted_eid_set->count > 0) {
 					RAWIDSET_push_guid_glob(sync_data->cnset_seen, &sync_data->replica_guid, (cn >> 16) & 0x0000ffffffffffff);
+                                        RAWIDSET_dump(sync_data->deleted_eid_set, "Deleted");
 				}
 			}
 			preload_mids.cValues = 0;
