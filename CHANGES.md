@@ -10,6 +10,7 @@ Unreleased changes refer to our current [master branch](https://github.com/openc
 * Do not abort on IDSET parsing but returning a format error
 * Perform proper decoding of idsets which contain GLOBSETs encoded using bitmask command.
 That avoids sync issues when returning the new state after badly parsing incoming one.
+* Do not abort on syncing in some errors from backend
 
 ## [2.4-zentyal11] - 2015-10-26
 
