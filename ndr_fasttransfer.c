@@ -641,6 +641,7 @@ _PUBLIC_ void ndr_print_SyncUploadStateStreamContinue_req(struct ndr_print *ndr,
 
 			buffer.length = r->StreamDataSize;
 			buffer.data = r->StreamData;
+			ndr_print_DATA_BLOB(ndr, "StateStream", buffer);
 			idset = IDSET_parse(mem_ctx, buffer, false);
 			ndr_print_IDSET(ndr, idset, name);
 			talloc_free(mem_ctx);
