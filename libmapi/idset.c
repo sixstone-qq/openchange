@@ -1086,6 +1086,11 @@ _PUBLIC_ enum MAPISTATUS IDSET_check_ranges(const struct idset *idset)
 			if (exchange_globcnt(range->low) > exchange_globcnt(range->high)) {
 				return ecRpcFormat;
 			}
+			if (range->next && i + 1 < idset->range_count) {
+				if (exchange_globcnt(range->high) > exchange_globcnt(range->next->low)) {
+					OC_DEBUG(5, "Strange that a next range in a globset is higher than a previous range: 0x%.12" PRIx64 " > 0x%.12" PRIx64, range->high, range->next->low);
+				}
+			}
 			range = range->next;
 		}
 		idset = idset->next;
