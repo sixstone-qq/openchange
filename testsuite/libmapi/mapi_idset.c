@@ -107,6 +107,35 @@ START_TEST (test_IDSET_parse_bitmask_cmd) {
 	ck_assert_int_eq(res->ranges->next->high, res->ranges->next->low);
 	ck_assert_int_eq(res->ranges->next->next->low, 0x078906000000);
 	ck_assert_int_eq(res->ranges->next->next->high, 0x098906000000);
+} END_TEST
+
+START_TEST (test_IDSET_parse_invalid) {
+	DATA_BLOB		bin;
+	int			i;
+	struct idset		*res;
+	/* Invalid command */
+	const uint8_t		case_0[] =
+		{0x1, 0x0, 0xBA, 0x0, 0x0, 0x0};
+	/* Too many PUSH commands */
+	const uint8_t		case_1[] =
+		{0x1, 0x0, 0x5, 0x0, 0x0, 0x0, 0x1, 0x4,
+		 0x2, 0x19, 0x1a, 0x1, 0xaa, 0x52, 0x19, 0x1a, 0x50, 0x0};
+	const uint8_t		case_2[] =
+		{0x1, 0x0, 0x1, 0xa, 0x1, 0xb, 0x1, 0xc,
+		 0x1, 0xd, 0x1, 0xe, 0x2, 0xf, 0xe, 0x1,
+		 0xa2, 0x1, 0xa1, 0x52, 0x19, 0x1a, 0x50, 0x0};
+	const uint8_t		 *cases[] = {case_0, case_1, case_2};
+	const size_t		 cases_size[] = { sizeof(case_0)/sizeof(uint8_t),
+						  sizeof(case_1)/sizeof(uint8_t),
+						  sizeof(case_2)/sizeof(uint8_t) };
+	const size_t		 CASES_NUM = sizeof(cases)/sizeof(uint8_t*);
+
+	for (i = 0; i < CASES_NUM; i++) {
+		bin.length = cases_size[i];
+		bin.data = (uint8_t *) cases[i];
+		res = IDSET_parse(mem_ctx, bin, true);
+		ck_assert(res == NULL);
+	}
 
 } END_TEST
 
@@ -327,6 +356,7 @@ Suite *libmapi_idset_suite(void)
 	tcase_add_checked_fixture(tc, tc_mapi_idset_setup, tc_mapi_idset_teardown);
 	tcase_add_test(tc, test_IDSET_parse);
 	tcase_add_test(tc, test_IDSET_parse_bitmask_cmd);
+	tcase_add_test(tc, test_IDSET_parse_invalid);
 	suite_add_tcase(s, tc);
 
 	tc = tcase_create("IDSET_includes_guid_glob");
