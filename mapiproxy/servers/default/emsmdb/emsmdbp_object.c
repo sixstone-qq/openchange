@@ -2391,11 +2391,12 @@ _PUBLIC_ void emsmdbp_fill_table_row_blob(TALLOC_CTX *mem_ctx, struct emsmdbp_co
 					  enum MAPITAGS *properties,
 					  void **data_pointers, enum MAPISTATUS *retvals)
 {
-        uint16_t i;
-        uint8_t flagged;
+        char          *out_str;
+        uint16_t      i;
+        uint8_t       flagged;
         enum MAPITAGS property;
-        void *data;
-        uint32_t retval;
+        void          *data;
+        uint32_t      retval;
 
         flagged = 0;
 
@@ -2427,6 +2428,8 @@ _PUBLIC_ void emsmdbp_fill_table_row_blob(TALLOC_CTX *mem_ctx, struct emsmdbp_co
                         data = data_pointers[i];
                 }
 
+                retval = mapidebug_property(mem_ctx, property, data, &out_str);
+                OC_DEBUG(5, "[%d] %s", i, out_str);
                 libmapiserver_push_property(mem_ctx,
                                             property, data, table_row,
                                             flagged?PT_ERROR:0, flagged, 0);

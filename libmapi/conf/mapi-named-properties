@@ -18,7 +18,7 @@
 #
 
 # Mapped Property ID is used by mapistore only to generate a named
-# prop ldb database on purpose. Values are extracted from an existing
+# properties database on purpose. Values are extracted from an existing
 # Exchange server we are using for development references / test
 # behavior. It means the value is really arbitrary and provided for
 # convenience purposes.

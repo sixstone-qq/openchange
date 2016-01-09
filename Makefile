@@ -306,6 +306,7 @@ libmapi.$(SHLIBEXT).$(PACKAGE_VERSION): 		\
 	libmapi/mapi_object.po				\
 	libmapi/mapi_id_array.po			\
 	libmapi/property_tags.po			\
+	libmapi/mapidebug.po				\
 	libmapi/mapidump.po				\
 	libmapi/mapicode.po 				\
 	libmapi/codepage_lcid.po			\
