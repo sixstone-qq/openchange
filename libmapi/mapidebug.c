@@ -35,17 +35,15 @@
    \param fmt_string the format string to dump
    \param va variable list of arguments before dumping the property value
 
-   \note it requires DUMP_PROP_VALUES defined in compilation time. If not,
+   \note it requires OC_DUMP_PROP_VALUES defined in compilation time. If not,
    then no dump is done
 
    \return the result of the operation for the caller to check if out is correct
 */
 _PUBLIC_ enum MAPISTATUS mapidebug_dump_property(uint32_t prop_tag, const void *value, uint8_t level, const char *fmt_string, ...)
 {
-#if (!defined(DUMP_PROP_VALUES))
-	return MAPI_E_SUCCESS;
-#else
-	char		*out_str;
+#ifdef OC_DUMP_PROP_VALUES
+	char		*out_str, *s;
 	enum MAPISTATUS retval;
 	TALLOC_CTX	*local_mem_ctx;
 	va_list		ap;
@@ -56,12 +54,15 @@ _PUBLIC_ enum MAPISTATUS mapidebug_dump_property(uint32_t prop_tag, const void *
 	retval = mapidebug_property(local_mem_ctx, prop_tag, value, &out_str);
 	if (retval == MAPI_E_SUCCESS) {
 		va_start(ap, fmt_string);
-		OC_DEBUG(level, fmt_string, ap, out_str);
+		vasprintf(&s, fmt_string, ap);
 		va_end(ap);
+		OC_DEBUG(level, "%s%s", s, out_str);
 	}
 
 	talloc_free(local_mem_ctx);
 	return retval;
+#else
+        return MAPI_E_SUCCESS;
 #endif
 }
 

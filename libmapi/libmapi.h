@@ -196,7 +196,9 @@ void			mapidump_freebusy_event(struct Binary_r *, uint32_t, uint32_t, const char
 void			mapidump_languages_list(void);
 
 /* The following public definitions come from libmapi/mapidebug.c */
+enum MAPISTATUS         mapidebug_dump_property(uint32_t, const void *, uint8_t level, const char *, ...);
 enum MAPISTATUS         mapidebug_property(TALLOC_CTX *, uint32_t, const void *, char **);
+
 
 /* The following public definitions come from libmapi/mapi_object.c */
 enum MAPISTATUS		mapi_object_init(mapi_object_t *);

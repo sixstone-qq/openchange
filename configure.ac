@@ -875,6 +875,16 @@ if test x$timers = xyes; then
 fi
 AC_SUBST(OC_TIMERS)
 
+AC_ARG_ENABLE(dump-prop-values, AC_HELP_STRING([--enable-dump-prop-values],
+			  [Dump property values in Property Value Getters ROPs]),
+			  dump_prop_values=yes,
+			  dump_prop_values=no)
+OC_DUMP_PROP_VALUES=
+if test x$dump_prop_values = xyes; then
+   OC_DUMP_PROP_VALUES=-DOC_DUMP_PROP_VALUES
+fi
+AC_SUBST(OC_DUMP_PROP_VALUES)
+
 dnl ***********************
 dnl Makefiles 
 dnl ***********************
@@ -959,6 +969,7 @@ OpenChange Configuration (Please review)
 	   * Options:
 	     - Use ANSI colors:		$ansi_color
 	     - Use oc timers:		$timers
+	     - Dump property values:	$dump_prop_values
 
 ===============================================================
 

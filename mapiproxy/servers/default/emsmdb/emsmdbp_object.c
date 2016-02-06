@@ -2428,8 +2428,7 @@ _PUBLIC_ void emsmdbp_fill_table_row_blob(TALLOC_CTX *mem_ctx, struct emsmdbp_co
                         data = data_pointers[i];
                 }
 
-                retval = mapidebug_property(mem_ctx, property, data, &out_str);
-                OC_DEBUG(5, "[%d] %s", i, out_str);
+                retval = mapidebug_dump_property(property, data, 5, "[%d] ", i);
                 libmapiserver_push_property(mem_ctx,
                                             property, data, table_row,
                                             flagged?PT_ERROR:0, flagged, 0);
@@ -3561,11 +3560,11 @@ _PUBLIC_ void emsmdbp_fill_row_blob(TALLOC_CTX *mem_ctx,
 				    enum MAPISTATUS *retvals,
 				    bool *untyped_status)
 {
-        uint16_t i;
-        uint8_t flagged;
+        uint16_t      i;
+        uint8_t       flagged;
         enum MAPITAGS property;
-        void *data;
-        uint32_t retval;
+        void          *data;
+        uint32_t      retval;
 
         flagged = 0;
         for (i = 0; !flagged && i < properties->cValues; i++) {
@@ -3585,6 +3584,7 @@ _PUBLIC_ void emsmdbp_fill_row_blob(TALLOC_CTX *mem_ctx,
                         property = properties->aulPropTag[i];
                         data = data_pointers[i];
                 }
+                mapidebug_dump_property(property, data, 5, "[%d] ", i);
                 libmapiserver_push_property(mem_ctx,
                                             property, data, property_row,
                                             flagged ? PT_ERROR : 0, flagged, untyped_status[i]);
