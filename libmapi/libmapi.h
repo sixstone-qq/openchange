@@ -196,8 +196,35 @@ void			mapidump_freebusy_event(struct Binary_r *, uint32_t, uint32_t, const char
 void			mapidump_languages_list(void);
 
 /* The following public definitions come from libmapi/mapidebug.c */
-enum MAPISTATUS         mapidebug_dump_property(uint32_t, const void *, uint8_t level, const char *, ...);
-enum MAPISTATUS         mapidebug_property(TALLOC_CTX *, uint32_t, const void *, char **);
+
+/**
+   Dump to log a property + its value using ':' as separator
+
+   \param prop_tag the property tag
+   \param value the value whose type is defined by prop_tag
+   \param level log level to dump
+   \param fmt_string the format string to dump
+   \param va variable list of arguments before dumping the property value
+
+   \note it requires DUMP_PROP_VALUES defined in compilation time. If not,
+   then no dump is done
+
+   \return the result of the operation for the caller to check if out is correct
+*/
+enum MAPISTATUS         mapidebug_dump_property(uint32_t prop_tag, const void *value, uint8_t level, const char *fmt_string, ...);
+
+/**
+   Output in out as string allocated in mem_ctx of a property + its
+   value using ':' as separator.
+
+   \param mem_ctx the memory context where out is allocated
+   \param prop_tag the property tag
+   \param value the value whose type is defined by prop_tag
+   \param out the string in format "prop_tag: prop_value"
+
+   \return the result of the operation for the caller to check if out is correct
+*/
+enum MAPISTATUS         mapidebug_property(TALLOC_CTX *mem_ctx, uint32_t prop_tag, const void *value, char **out);
 
 
 /* The following public definitions come from libmapi/mapi_object.c */
